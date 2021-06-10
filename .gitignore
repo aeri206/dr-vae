@@ -1,0 +1,4 @@
+data/
+data_0610/
+*.json
+.ipynb_checkpoints
