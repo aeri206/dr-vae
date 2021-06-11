@@ -27,6 +27,8 @@ CORS(app)
 
 latent_dims = 5
 vae = None
+latent_emb = None
+latent_label = None
 
 
 
@@ -37,15 +39,26 @@ def getArrayData(request, key_name):
 
 @app.route('/reconstruction')
 def reconstruction():
+    global vae
     latent_values = getArrayData(request, "latentValues")
-
     return jsonify(vae.reconstruct(np.array(latent_values)).tolist()[0])
     
-
+@app.route('/getlatentemb')
+def get_latent_emb():
+    global latent_dims
+    global latent_label
+    return jsonify({
+        "emb": latent_emb,
+        "label": latent_label
+    })
 
 
 
 if __name__ == '__main__':
     vae = MODEL(latent_dims)
+    with open('../latent_emb.json') as f:
+        latent_emb = json.load(f)
+    with open('../method_num.json') as fi:
+        latent_label = json.load(fi)
     app.run(debug=True)
     
