@@ -72,5 +72,4 @@ class MODEL:
     def reconstruct(self, latent_vec):
         z = torch.Tensor([latent_vec]).to(device)
         x_hat = self.model.decoder(z)
-        print(x_hat)
-        pass
+        return x_hat
