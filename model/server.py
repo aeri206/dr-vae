@@ -32,6 +32,7 @@ latent_emb = None
 latent_label = None
 latent_vector = None
 nn = None
+nn_emb = None
 
 
 
@@ -69,7 +70,26 @@ def get_knn():
         "labels": label_result.tolist(),
         "coor": coordinate.tolist()
     }
-    # return "succcess"
+
+@app.route('/latentcoortoothers')
+def latent_coor_to_others():
+    global nn_emb
+    global latent_vector
+    global vae
+
+    latent_coor = getArrayData(request, "coor")
+
+    knn = ((nn_emb.kneighbors([latent_coor])[1])[0]).tolist()
+    label_result = latent_label[knn]
+    vector = np.sum(latent_vector[knn], axis=0) / 100
+
+    # vae.reconstruct(vector)
+
+    return {
+        "labels": label_result.tolist(),
+        "latent_values": vector.tolist(),
+        "emb": vae.reconstruct(vector).tolist()[0]
+    }
 
 
 if __name__ == '__main__':
@@ -79,7 +99,8 @@ if __name__ == '__main__':
     with open('../method_num.json') as fi:
         latent_label = np.array(json.load(fi))
     with open('../latent_vector.json') as fil:
-        latent_vector = json.load(fil)
+        latent_vector = np.array(json.load(fil))
     nn = NearestNeighbors(n_neighbors=100, algorithm='ball_tree').fit(latent_vector)
+    nn_emb = NearestNeighbors(n_neighbors=100, algorithm='ball_tree').fit(latent_emb)
     app.run(debug=True)
     
