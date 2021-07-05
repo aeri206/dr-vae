@@ -1,0 +1,48 @@
+name: dr-vae-dataset
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - _libgcc_mutex=0.1=main
+  - _openmp_mutex=4.5=1_gnu
+  - blas=1.0=mkl
+  - ca-certificates=2021.5.30=ha878542_0
+  - certifi=2021.5.30=py38h578d9bd_0
+  - intel-openmp=2021.2.0=h06a4308_610
+  - joblib=1.0.1=pyhd8ed1ab_0
+  - ld_impl_linux-64=2.35.1=h7274673_9
+  - libffi=3.3=he6710b0_2
+  - libgcc-ng=9.3.0=h5101ec6_17
+  - libgfortran-ng=7.5.0=h14aa051_19
+  - libgfortran4=7.5.0=h14aa051_19
+  - libgomp=9.3.0=h5101ec6_17
+  - libllvm10=10.0.1=he513fc3_3
+  - libstdcxx-ng=9.3.0=hd4cf53a_17
+  - llvmlite=0.36.0=py38h4630a5e_0
+  - mkl=2021.2.0=h06a4308_296
+  - mkl-service=2.3.0=py38h27cfd23_1
+  - mkl_fft=1.3.0=py38h42c9631_2
+  - mkl_random=1.2.1=py38ha9443f7_2
+  - ncurses=6.2=he6710b0_1
+  - numba=0.53.1=py38h8b71fd7_1
+  - numpy=1.20.2=py38h2d18471_0
+  - numpy-base=1.20.2=py38hfae3a4d_0
+  - openssl=1.1.1k=h7f98852_0
+  - pip=21.1.3=py38h06a4308_0
+  - pynndescent=0.5.2=pyh44b312d_0
+  - python=3.8.5=h7579374_1
+  - python_abi=3.8=2_cp38
+  - readline=8.1=h27cfd23_0
+  - scikit-learn=0.24.2=py38ha9443f7_0
+  - scipy=1.6.2=py38had2a1c9_1
+  - setuptools=52.0.0=py38h06a4308_0
+  - six=1.16.0=pyhd3eb1b0_0
+  - sqlite=3.36.0=hc218d9a_0
+  - tbb=2020.2=h4bd325d_4
+  - threadpoolctl=2.1.0=pyh5ca1d4c_0
+  - tk=8.6.10=hbc83047_0
+  - umap-learn=0.5.1=py38h578d9bd_1
+  - wheel=0.36.2=pyhd3eb1b0_0
+  - xz=5.2.5=h7b6447c_0
+  - zlib=1.2.11=h7b6447c_3
+prefix: /home/hj/anaconda3/envs/dr-vae-dataset
