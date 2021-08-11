@@ -18,7 +18,7 @@ def umap_generate_embeddings(raw_data, path_to_save, iteration, log_interval, se
 		min_dist = np.random.rand()
 		n_neighbors = np.random.randint(3, 101)
 		emb = umap_embedding(raw_data, min_dist, n_neighbors)
-		with open(umap_path + str(i) + ".json", "w") as outfile:
+		with open(umap_path + str(i + (set_num - 1) * iteration) + ".json", "w") as outfile:
 			json.dump({
 				"min_dist" : min_dist,
 				"n_neighbors" : n_neighbors,
@@ -46,7 +46,7 @@ def tsne_generate_embeddings(raw_data, path_to_save, iteration, log_interval, se
 		early_exaggeration = np.random.rand() * 45 + 5
 		learning_rate = np.random.rand() * 480 + 20
 		emb = tsne_embedding(raw_data, perplexity, early_exaggeration, learning_rate)
-		with open(tsne_path + str(i) + ".json", "w") as outfile:
+		with open(tsne_path + str(i + (set_num - 1) * iteration) + ".json", "w") as outfile:
 			json.dump({
 				"perplexity": perplexity,
 				"early_exaggeration": early_exaggeration,
@@ -76,7 +76,7 @@ def isomap_generate_embeddings(raw_data, path_to_save, iteration, log_interval, 
 	for i in range(1, iteration + 1):
 		n_neighbors = np.random.randint(3, 101)
 		emb = isomap_embedding(raw_data, n_neighbors)
-		with open(isomap_path + str(i) + ".json", "w") as outfile:
+		with open(isomap_path + str(i + (set_num - 1) * iteration) + ".json", "w") as outfile:
 			json.dump({
 				"n_neighbors": n_neighbors,
 				"emb": emb
@@ -101,7 +101,7 @@ def lle_generate_embeddings(raw_data, path_to_save, iteration, log_interval, set
 	for i in range(1, iteration + 1):
 		n_neighbors = np.random.randint(3, 101)
 		emb = lle_embedding(raw_data, n_neighbors)
-		with open(lle_path + str(i) + ".json", "w") as outfile:
+		with open(lle_path + str(i + (set_num - 1) * iteration) + ".json", "w") as outfile:
 			json.dump({
 				"n_neighbors": n_neighbors,
 				"emb": emb
