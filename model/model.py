@@ -65,7 +65,7 @@ class MODEL:
         self.latent_dims = latent_dims
         self.model = VAE(latent_dims, device)
         model_path = './model.pt'
-        self.model.load_state_dict(torch.load(model_path), strict=False)
+        self.model.load_state_dict(torch.load(model_path, map_location=device), strict=False)
     
 # import sys; sys.path.append("/home/archo/vae_dr/dr-vae-backend/model"); from model import VAE_MODEL; v = VAE_MODEL(5)
     
