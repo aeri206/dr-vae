@@ -90,7 +90,7 @@ start_time = time.time()
 process_list = []
 for target in target_list:
 	for i in range(1, cpu_per_method + 1):
-		process = Process(target=target, args=(raw, path_to_save, iteration, log_interval, i))
+		process = Process(target=target, args=(raw, path_to_save, iteration, log_interval, i * iteration))
 		process_list.append(process)
 		process.start()
 	for i in range(cpu_per_method):
