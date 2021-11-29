@@ -3,8 +3,7 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 
-# from model import MODEL
-from model_synthetic import MODEL_SYNTHETIC
+from model import MODEL
 import numpy as np
 import time
 import json
@@ -14,7 +13,6 @@ from sklearn.neighbors import NearestNeighbors
 app = Flask(__name__)
 CORS(app)
 
-# latent_dims = 5
 point_count = 2318
 vae = None
 latent_emb = None
@@ -46,7 +44,7 @@ def reload():
     # print(path)
     model_dir = './'+ dataset + '/' + pointNum + '/'
     model_path = model_dir + 'model.pt'
-    vae = MODEL_SYNTHETIC(model_path)
+    vae = MODEL(model_path)
     latent_dims = vae.latent_dims
 
 
@@ -92,10 +90,8 @@ def get_knn():
     global latent_label
     global latent_emb
     latent_values = getArrayData(request, "latentValues")
-    # print(latent_values)
     knn = ((nn.kneighbors([latent_values])[1])[0]).tolist()
     label_result = latent_label[knn] #class?
-    # print(label_result)
     coordinate = np.sum(latent_emb[knn], axis=0) / 100
     return {
         "labels": label_result.tolist(),
@@ -113,8 +109,7 @@ def latent_coor_to_others():
     knn = ((nn_emb.kneighbors([latent_coor])[1])[0]).tolist()
     label_result = latent_label[knn]
     vector = np.sum(latent_vector[knn], axis=0) / nn_emb_NUM
-    # print(vector)
-
+    
     return {
         "labels": label_result.tolist(),
         "latent_values": vector.tolist(),
@@ -123,7 +118,4 @@ def latent_coor_to_others():
     }
 
 if __name__ == '__main__':
-    # vae = MODEL (latent_dims)
-    # vae = MODEL_SYNTHETIC(latent_dims, point_count)
-    print('server.py')
     app.run(debug=True)
