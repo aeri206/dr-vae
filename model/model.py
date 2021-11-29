@@ -9,7 +9,7 @@ import numpy as np
 
 from sklearn.neighbors import NearestNeighbors
 
-import matplotlib.pyplot as plt; plt.rcParams['figure.dpi'] = 200
+# import matplotlib.pyplot as plt; plt.rcParams['figure.dpi'] = 200
 
 from path import Path
 import os

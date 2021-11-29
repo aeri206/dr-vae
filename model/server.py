@@ -1,22 +1,10 @@
 
 
-
-
-
-# def call():
-#     v = MODEL(latent_dims)
-#     vec = np.random.rand(latent_dims)
-#     start_time = time.time()
-#     v.reconstruct(vec)
-#     print("--- %s seconds ---" % (time.time() - start_time))
-
-# call()
-
-
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 
-from model import MODEL
+# from model import MODEL
+from model_synthetic import MODEL_SYNTHETIC
 import numpy as np
 import time
 import json
@@ -26,13 +14,16 @@ from sklearn.neighbors import NearestNeighbors
 app = Flask(__name__)
 CORS(app)
 
-latent_dims = 5
+# latent_dims = 5
+point_count = 2318
 vae = None
 latent_emb = None
 latent_label = None
 latent_vector = None
 nn = None
 nn_emb = None
+nn_emb_NUM = 10
+latent_dims = None
 
 
 
@@ -41,15 +32,54 @@ def getArrayData(request, key_name):
     array_data = np.array(json.loads(array_data)["data"]).astype(np.float32)
     return array_data
 
+@app.route('/reload')
+def reload():
+    global vae
+    global latent_emb
+    global latent_label
+    global latent_vector
+    global nn
+    global nn_emb
+    global latent_dims
+    dataset = request.args.get("dataset")
+    pointNum = request.args.get("pointNum")
+    # print(path)
+    model_dir = './'+ dataset + '/' + pointNum + '/'
+    model_path = model_dir + 'model.pt'
+    vae = MODEL_SYNTHETIC(model_path)
+    latent_dims = vae.latent_dims
+
+
+    with open(model_dir +'latent_emb.json') as f:
+        latent_emb = np.array(json.load(f))
+    with open(model_dir +'method_num.json') as fi:
+        latent_label = np.array(json.load(fi))
+    with open(model_dir +'latent_vector.json') as fil: # = point_count
+        latent_vector = np.array(json.load(fil))
+    nn = NearestNeighbors(n_neighbors=100, algorithm='ball_tree').fit(latent_vector)
+    nn_emb = NearestNeighbors(n_neighbors=nn_emb_NUM, algorithm='ball_tree').fit(latent_emb)
+    return jsonify(vae.latent_dims)
+
+@app.route('/getdims')
+def get_latent_dims():
+    global latent_dims
+    if latent_dims is None:
+        latent_dims = reload()
+        return latent_dims
+    else:
+        return jsonify(latent_dims)
+
+
 @app.route('/reconstruction')
 def reconstruction():
     global vae
     latent_values = getArrayData(request, "latentValues")
+    # print(vae.reconstruct(np.array(latent_values)).tolist()[0])
     return jsonify(vae.reconstruct(np.array(latent_values)).tolist()[0])
     
 @app.route('/getlatentemb')
 def get_latent_emb():
-    global latent_dims
+    global latent_emb
     global latent_label
     return jsonify({
         "emb": latent_emb.tolist(),
@@ -64,7 +94,8 @@ def get_knn():
     latent_values = getArrayData(request, "latentValues")
     # print(latent_values)
     knn = ((nn.kneighbors([latent_values])[1])[0]).tolist()
-    label_result = latent_label[knn]
+    label_result = latent_label[knn] #class?
+    # print(label_result)
     coordinate = np.sum(latent_emb[knn], axis=0) / 100
     return {
         "labels": label_result.tolist(),
@@ -78,29 +109,21 @@ def latent_coor_to_others():
     global vae
 
     latent_coor = getArrayData(request, "coor")
-
+    
     knn = ((nn_emb.kneighbors([latent_coor])[1])[0]).tolist()
     label_result = latent_label[knn]
-    vector = np.sum(latent_vector[knn], axis=0) / 100
-
-    # vae.reconstruct(vector)
+    vector = np.sum(latent_vector[knn], axis=0) / nn_emb_NUM
+    # print(vector)
 
     return {
         "labels": label_result.tolist(),
         "latent_values": vector.tolist(),
         "emb": vae.reconstruct(vector).tolist()[0]
+
     }
 
-
 if __name__ == '__main__':
-    vae = MODEL(latent_dims)
-    with open('../latent_emb.json') as f:
-        latent_emb = np.array(json.load(f))
-    with open('../method_num.json') as fi:
-        latent_label = np.array(json.load(fi))
-    with open('../latent_vector.json') as fil:
-        latent_vector = np.array(json.load(fil))
-    nn = NearestNeighbors(n_neighbors=100, algorithm='ball_tree').fit(latent_vector)
-    nn_emb = NearestNeighbors(n_neighbors=100, algorithm='ball_tree').fit(latent_emb)
+    # vae = MODEL (latent_dims)
+    # vae = MODEL_SYNTHETIC(latent_dims, point_count)
+    print('server.py')
     app.run(debug=True)
-    
