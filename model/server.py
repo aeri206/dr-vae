@@ -44,7 +44,7 @@ def reload():
     # print(path)
     model_dir = './'+ dataset + '/' + pointNum + '/'
     model_path = model_dir + 'model.pt'
-    vae = MODEL(model_path)
+    vae = MODEL(model_path, dataset, int(pointNum))
     latent_dims = vae.latent_dims
 
 

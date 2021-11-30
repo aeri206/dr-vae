@@ -1,19 +1,27 @@
 import torch; torch.manual_seed(0)
 import torch.nn as nn
 import numpy as np
+import math
+from collections import Counter
 
 
 device= 'cpu'
     
 
 class MODEL:
-    def __init__(self, model_path):
+    def __init__(self, model_path, dataset, point_num):
         super(MODEL, self).__init__()
         model_state = torch.load(model_path, map_location=device)
+        
+        
+        count_dims = Counter(model_state[x].shape[0] for x in model_state.keys() if x.endswith('.bias'))
         dims = list(set(model_state[x].shape[0] for x in model_state.keys() if x.endswith('.bias')))
+        
         
         decoder = []
         dims.sort()
+        if count_dims[2 * point_num] > 2:
+            dims.append(2 * point_num)
         self.latent_dims = dims[0]
         self.relu = nn.ReLU()
         self.sigmoid = nn.Sigmoid()
