@@ -1,6 +1,7 @@
 .ipynb_checkpoints
 *.pt
-
+*.json
+*.tar.gz
 
 ### Python ###
 # Byte-compiled / optimized / DLL files

@@ -26,6 +26,8 @@ import json
 import numpy as np
 import time
 
+torch.multiprocessing.freeze_support()
+
 parser = argparse.ArgumentParser(description="Dataset Generation for DR_VAE", formatter_class=argparse.RawTextHelpFormatter)
 parser.add_argument('-d', '--dataset', help="The dataset to generate DR embedding -- name of directory")
 parser.add_argument('-s', '--size',  help="The size of dataset -- name of subdirectory\n" + " (under the directory denoting --dataset)")

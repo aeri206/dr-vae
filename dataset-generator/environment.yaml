@@ -1,4 +1,4 @@
-name: dr-vae-dataset
+name: dr-vae-data
 channels:
   - conda-forge
   - defaults

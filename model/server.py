@@ -1,5 +1,6 @@
 
 
+from glob import glob
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 
@@ -13,15 +14,15 @@ from sklearn.neighbors import NearestNeighbors
 app = Flask(__name__)
 CORS(app)
 
-point_count = 2318
 vae = None
 latent_emb = None
-latent_label = None
+latent_label = None #method_num
 latent_vector = None
 nn = None
 nn_emb = None
 nn_emb_NUM = 10
 latent_dims = None
+nNeighbors = 50
 
 
 
@@ -39,6 +40,7 @@ def reload():
     global nn
     global nn_emb
     global latent_dims
+    global nNeighbors
     dataset = request.args.get("dataset")
     pointNum = request.args.get("pointNum")
     # print(path)
@@ -50,12 +52,16 @@ def reload():
 
     with open(model_dir +'latent_emb.json') as f:
         latent_emb = np.array(json.load(f))
+        nNeighbors = max(10, min(int(len(latent_emb)* 0.1), 100))
+        print('nNeighbors', nNeighbors)
     with open(model_dir +'method_num.json') as fi:
         latent_label = np.array(json.load(fi))
     with open(model_dir +'latent_vector.json') as fil: # = point_count
         latent_vector = np.array(json.load(fil))
-    nn = NearestNeighbors(n_neighbors=100, algorithm='ball_tree').fit(latent_vector)
+    nn = NearestNeighbors(n_neighbors=nNeighbors, algorithm='ball_tree').fit(latent_vector)
+    #latent vector : #embedding * latent_dim
     nn_emb = NearestNeighbors(n_neighbors=nn_emb_NUM, algorithm='ball_tree').fit(latent_emb)
+    #latent_emb : #embdddning * UMAP result
     return jsonify(vae.latent_dims)
 
 @app.route('/getdims')
@@ -72,7 +78,9 @@ def get_latent_dims():
 def reconstruction():
     global vae
     latent_values = getArrayData(request, "latentValues")
-    # print(vae.reconstruct(np.array(latent_values)).tolist()[0])
+    #return shape : (point_count, 2)
+    # print(latent_values)
+
     return jsonify(vae.reconstruct(np.array(latent_values)).tolist()[0])
     
 @app.route('/getlatentemb')
@@ -87,16 +95,34 @@ def get_latent_emb():
 @app.route('/getknn')
 def get_knn():
     global nn
+    global vae
     global latent_label
     global latent_emb
-    latent_values = getArrayData(request, "latentValues")
-    knn = ((nn.kneighbors([latent_values])[1])[0]).tolist()
-    label_result = latent_label[knn] #class?
-    coordinate = np.sum(latent_emb[knn], axis=0) / 100
-    return {
-        "labels": label_result.tolist(),
-        "coor": coordinate.tolist()
-    }
+    global latent_vector
+    n = int(request.args.get("n"))
+    latent_values = getArrayData(request, "latentValues") #내가 요청보낸거
+    knn = ((nn.kneighbors([latent_values])[1])[0]).tolist() #top indices
+    # print(nn.kneighbors([latent_values])[0])#거리 : (1, 100) : (1, neghbors)
+    # print(nn.kneighbors([latent_values])[1]) #indicies (1, neighbors)
+    if (n > 0):
+        knn = knn[:n]
+        label_result = latent_label[knn]
+        latent_result = latent_vector[knn]
+        
+        x = [vae.reconstruct(x)[0].tolist() for x in latent_result]
+        # print(vae.reconstruct(latent_result).shape) #(5, 2000, 2)
+        return {
+            "labels": label_result.tolist(),
+            "embs": x,
+            "latents": latent_result.tolist()
+        }
+    else:
+        label_result = latent_label[knn] #class? (neighbors, )
+        coordinate = np.sum(latent_emb[knn], axis=0) / nNeighbors
+        return {
+            "labels": label_result.tolist(),
+            "coor": coordinate.tolist()
+        }
 
 @app.route('/latentcoortoothers')
 def latent_coor_to_others():
