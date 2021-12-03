@@ -2,6 +2,8 @@
 *.pt
 *.json
 *.tar.gz
+*.csv
+*.swp
 
 ### Python ###
 # Byte-compiled / optimized / DLL files
