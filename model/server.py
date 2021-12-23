@@ -101,6 +101,15 @@ def get_latent_emb():
     global latent_emb
     global latent_label
     global latent_vector
+    if_weight = bool(int(request.args.get("ifWeight")))
+    weight = []
+    if if_weight:
+        weight_dir  = './'+ dataset + '/' + pointNum + '/weight/' 
+        weight = [read_file(weight_dir + x) for x in files]
+        
+        
+
+
     if latent_emb is None:
         emb = []
     else:
@@ -115,10 +124,10 @@ def get_latent_emb():
         vec = latent_vector.tolist()
 
     return jsonify({
-        "emb": emb, 
-        # "emb": latent_emb.tolist(), #에러 나옴
+        "emb": emb,
         "label": label,
-        "vec": vec
+        "vec": vec,
+        "weight": weight
     })
 
 def read_file(path):
@@ -158,6 +167,7 @@ def get_knn():
         
         x = [vae.reconstruct(x)[0].tolist() for x in latent_result]
         # print(vae.reconstruct(latent_result).shape) #(5, 2000, 2)
+        print(file_result)
         return {
             "labels": label_result.tolist(),
             "embs": x,
